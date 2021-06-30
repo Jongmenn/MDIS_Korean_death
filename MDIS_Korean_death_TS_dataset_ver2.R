@@ -7,9 +7,10 @@
 
 daily_count2<-function(data){
   z<-data %>% dplyr:: mutate(tot=Total,m=sex_m,f=sex_f,
+                             age0005=ag01,
                              age0014=ag01+ag02+ag03,
                              age1564=ag04+ag05+ag06+ag07+ag08+ag09+ag10+ag11+ag12+ag13,
-                             age65  =ag14+ag15+ag16+ag17+ag18+ag19) %>%  select(tot,m,f,age0014,age1564,age65)
+                             age65  =ag14+ag15+ag16+ag17+ag18+ag19) %>%  select(tot,m,f,age0005,age0014,age1564,age65)
   tibble(z)}
 
 tt01<-daily_count2(ts01);names(tt01)=paste0("D01_",names(tt01))
