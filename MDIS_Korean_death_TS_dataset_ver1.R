@@ -71,7 +71,7 @@ ts13<-daily_count(z13);ts14<-daily_count(z14);ts15<-daily_count(z15);ts16<-daily
 ts17<-daily_count(z17);ts18<-daily_count(z18);ts19<-daily_count(z19);ts20<-daily_count(z20)
 ts21<-daily_count(z21);ts22<-daily_count(z22);ts23<-daily_count(z23);ts24<-daily_count(z24)
 ts25<-daily_count(z25);ts26<-daily_count(z26);ts27<-daily_count(z27);ts28<-daily_count(z28)
-ts29<-daily_count(z29);ts30<-daily_count(z30);ts31<-daily_count(z31);
+ts29<-daily_count(z29);ts30<-daily_count(z30);ts31<-daily_count(z31)
 
 #--------------------------------------------------------------------------------------------------#
 #--------------------------------------------------------------------------------------------------#
