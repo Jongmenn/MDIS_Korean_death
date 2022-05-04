@@ -6,9 +6,10 @@ pacman::p_load("dplyr","ggplot2","reshape2","sqldf","RColorBrewer","lubridate","
                "gamm4")
 
 #Time-series data
+rep(ymd(seq(as.Date("2001-01-01"),as.Date("2020-12-31"),1)),17) %>% length
 
-dd<-data.frame(date=rep(ymd(seq(as.Date("2001-01-01"),as.Date("2019-12-31"),1)),17),
-               sido=rep(c(11,21:25,26,29,31:39),each=6939))
+dd<-data.frame(date=rep(ymd(seq(as.Date("2001-01-01"),as.Date("2020-12-31"),1)),17),
+               sido=rep(c(11,21:25,26,29,31:39),each=7305))
 dd$key=paste0(dd$sido,"-",dd$date)
 
 sido_df<-data.frame(sido=c(11,21:25,26,29,31:39),
@@ -20,12 +21,15 @@ sido_df<-data.frame(sido=c(11,21:25,26,29,31:39),
 #--------------------------------------------------------------------------------------------------#
 #--------------------------------------------------------------------------------------------------#
 #기상청 원시자료 
-me<-read_excel("D:\\서울대예방의학교실\\연구\\질병관리본부\\기후보건영향평가_평가체계구축및시범사업\\2021\\자료\\기상자료_대기오염_업데이트_일별_2000_2020_OJM.xlsx",sheet=4)
-me$key=paste0(me$KOR_SIDO,"-",me$date)
+setwd("D:\\SNU\\연구\\질병관리본부\\기후보건영향평가_평가체계구축및시범사업\\2022\\자료\\기상자료")
+me<-read.csv("wea_ap2001_2020_update.csv")
+head(me)
+me$key=paste0(me$area,"-",me$ddate)
 
 #--------------------------------------------------------------------------------------------------#
 #--------------------------------------------------------------------------------------------------#
 #version 1, 세부적으로 나눠서 각각 
+
 #일일 건수, 시계열 자료 함수 
 daily_count<-function(data){
   
@@ -61,7 +65,8 @@ daily_count<-function(data){
   zz2$key=paste0(zz2$KOR_SIDO,"-",zz2$date)
   zz2<-zz2 %>% select(-date)
   zz3<-zz2 %>% left_join (me)
-  zz3<-zz3 %>% dplyr:: select(key,date,sido,KOR_SIDO,EN_SIDO,year:dow,Total:ag19_f,mintemp:meanpress2) %>% arrange(sido);
+  zz3<-zz3  %>% arrange(sido);
+  #zz3<-zz3 %>% dplyr:: select(key,date,sido,KOR_SIDO,EN_SIDO,year:dow,Total:ag19_f,mintemp:meanpress2) %>% arrange(sido);
   zz3}
 
 ts01<-daily_count(z01);ts02<-daily_count(z02);ts03<-daily_count(z03);ts04<-daily_count(z04)
@@ -76,4 +81,21 @@ ts29<-daily_count(z29);ts30<-daily_count(z30);ts31<-daily_count(z31)
 #--------------------------------------------------------------------------------------------------#
 #--------------------------------------------------------------------------------------------------#
 #Save the results (01-31)
-# write.csv(ts01,file="D:\\서울대예방의학교실\\연구\\질병관리본부\\기후보건영향평가_평가체계구축및시범사업\\2021\\자료\\ts01.csv",row.names=F,na="")
+setwd("D:\\SNU\\연구\\질병관리본부\\기후보건영향평가_평가체계구축및시범사업\\2022\\자료\\통계청\\질환별_ver1")
+
+write.csv(ts01,file="ts01.csv",row.names=F,na="");write.csv(ts02,file="ts02.csv",row.names=F,na="")
+write.csv(ts03,file="ts03.csv",row.names=F,na="");write.csv(ts04,file="ts04.csv",row.names=F,na="")
+write.csv(ts05,file="ts05.csv",row.names=F,na="");write.csv(ts06,file="ts06.csv",row.names=F,na="")
+write.csv(ts07,file="ts07.csv",row.names=F,na="");write.csv(ts08,file="ts08.csv",row.names=F,na="")
+write.csv(ts09,file="ts09.csv",row.names=F,na="");write.csv(ts10,file="ts10.csv",row.names=F,na="")
+write.csv(ts11,file="ts11.csv",row.names=F,na="");write.csv(ts12,file="ts12.csv",row.names=F,na="")
+write.csv(ts13,file="ts13.csv",row.names=F,na="");write.csv(ts14,file="ts14.csv",row.names=F,na="")
+write.csv(ts15,file="ts15.csv",row.names=F,na="");write.csv(ts16,file="ts16.csv",row.names=F,na="")
+write.csv(ts17,file="ts17.csv",row.names=F,na="");write.csv(ts18,file="ts18.csv",row.names=F,na="")
+write.csv(ts19,file="ts19.csv",row.names=F,na="");write.csv(ts20,file="ts20.csv",row.names=F,na="")
+write.csv(ts21,file="ts21.csv",row.names=F,na="");write.csv(ts22,file="ts22.csv",row.names=F,na="")
+write.csv(ts23,file="ts23.csv",row.names=F,na="");write.csv(ts24,file="ts24.csv",row.names=F,na="")
+write.csv(ts25,file="ts25.csv",row.names=F,na="");write.csv(ts26,file="ts26.csv",row.names=F,na="")
+write.csv(ts27,file="ts27.csv",row.names=F,na="");write.csv(ts28,file="ts28.csv",row.names=F,na="")
+write.csv(ts29,file="ts29.csv",row.names=F,na="");write.csv(ts30,file="ts30.csv",row.names=F,na="")
+write.csv(ts31,file="ts31.csv",row.names=F,na="")
