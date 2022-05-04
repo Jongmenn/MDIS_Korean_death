@@ -1,5 +1,5 @@
 ##################################################
-######´Ü±¹´ë-±âÈÄº¸°Ç¿µÇâÆò°¡ - Åë°èÃ» DB#########
+######ë‹¨êµ­ëŒ€-ê¸°í›„ë³´ê±´ì˜í–¥í‰ê°€ - í†µê³„ì²­ DB#########
 ##################################################
 
 #--------------------------------------------------------------------------------------------------#
@@ -12,219 +12,250 @@ pacman::p_load("dplyr","ggplot2","reshape2","sqldf","RColorBrewer","lubridate","
 #--------------------------------------------------------------------------------------------------#
 #--------------------------------------------------------------------------------------------------#
 #working directory
-setwd("D:\\EUMC\\µ¥ÀÌÅÍ°ü¸®\\Åë°èÃ»_MDIS\\º¸°Çº¹Áö\\»ç¸Á¿øÀÎÅë°è\\»ç¸Á¿¬°£ÀÚ·á\\AÇü")
+setwd("D:\\EUMC\\ë°ì´í„°ê´€ë¦¬\\í†µê³„ì²­_MDIS\\ë³´ê±´ë³µì§€\\ì‚¬ë§ì›ì¸í†µê³„\\ì‚¬ë§ì—°ê°„ìë£Œ\\Aí˜•")
 
-dataset_label<-list.files()[grep("»ç¸Á_¿¬°£ÀÚ·á",list.files())]
+dataset_label<-list.files()[grep("ì‚¬ë§_ì—°ê°„ìë£Œ",list.files())]
 
 data.list=NULL
-#¿øÀÚ·á º¯¼ö ÀÌ¸§ µ¿ÀÏ, ÀÌÁß ÇÊ¿äÇÑ °Í¸¸, ÁÖ¼Ò(½Ãµµ), ¼ºº°, »ç¸Á¿¬¿ùÀÏ, »ç¸Á¿¬·É(°¢¼¼),»ç¸Á¿øÀÎ 1, »ç¸Á¿øÀÎ 2
+#ì›ìë£Œ ë³€ìˆ˜ ì´ë¦„ ë™ì¼, ì´ì¤‘ í•„ìš”í•œ ê²ƒë§Œ, ì£¼ì†Œ(ì‹œë„), ì„±ë³„, ì‚¬ë§ì—°ì›”ì¼, ì‚¬ë§ì—°ë ¹(ê°ì„¸),ì‚¬ë§ì›ì¸ 1, ì‚¬ë§ì›ì¸ 2
 for(i in 1:length(dataset_label)){
-  data.list[[i]]<-read.csv(dataset_label[i]) %>% dplyr:: select("»ç¸ÁÀÚ.ÁÖ¼Ò.½Ãµµ.":"»ç¸Á¿¬¿ùÀÏ","»ç¸Á¿¬·É.°¢¼¼.",
-                                                                "»ç¸Á¿øÀÎ1","»ç¸Á¿øÀÎ2")
+  data.list[[i]]<-read.csv(dataset_label[i]) %>% dplyr:: select("ì‚¬ë§ì.ì£¼ì†Œ.ì‹œë„.":"ì‚¬ë§ì—°ì›”ì¼","ì‚¬ë§ì—°ë ¹.ê°ì„¸.",
+                                                                "ì‚¬ë§ì›ì¸1","ì‚¬ë§ì›ì¸2")
   names(data.list[[i]])=c("sido","sex","death_date","death_age","death1","death2")
   print(i)}
 
-stat01_19<-as.data.frame(do.call(rbind,data.list));rm(data.list)
+stat01_20<-as.data.frame(do.call(rbind,data.list));rm(data.list)
 
-stat01_19$date =ymd(stat01_19$death_date)
-stat01_19$year =year(stat01_19$date)
-stat01_19$month=month(stat01_19$date)
-stat01_19$day  =day(stat01_19$date)
+stat01_20$date =ymd(stat01_20$death_date)
+stat01_20$year =year(stat01_20$date)
+stat01_20$month=month(stat01_20$date)
+stat01_20$day  =day(stat01_20$date)
 
-nrow(stat01_19) #4,963,750
-addmargins(table(stat01_19$year))
+nrow(stat01_20) #5,268,698
 
+#ì‹œë„, ì‚¬ë§ì—°ë ¹, ì‚¬ë§ì›ì¸ ê²°ì¸¡ ê²€í†  
+table(is.na(stat01_20$sido))
+table(is.na(stat01_20$death_age))
+table(is.na(stat01_20$death1))
+
+#ì‚¬ë§ì—°ë ¹ì€ "999"ë¡œ ê²°ì¸¡ê°’ í‘œê¸°í•´ì„œ í™•ì¸ í•„ìš” 
 #missing value:999
-summary(stat01_19$death_age)
+summary(stat01_20$death_age)
+addmargins(table(stat01_20$death_age))
 
-stat01_19<-subset(stat01_19,death_age!=999)
-summary(stat01_19$death_age)
+subset(stat01_20,death_age==999)$year %>% table
 
-nrow(stat01_19) #4,963,151
-addmargins(substr(stat01_19$death1,1,1) %>% table)
-addmargins(table(stat01_19$sido))
-addmargins(table(stat01_19$sex))
+stat01_20<-subset(stat01_20,death_age!=999)
 
-#--------------------------------------------------------------------------------------------------#
-#--------------------------------------------------------------------------------------------------#
-#¿¬·É
-stat01_19$ag01=with(stat01_19,ifelse(death_age<5,1,0))
-stat01_19$ag02=with(stat01_19,ifelse(death_age>=5 & death_age<10,1,0))
-stat01_19$ag03=with(stat01_19,ifelse(death_age>=10 & death_age<15,1,0))
-stat01_19$ag04=with(stat01_19,ifelse(death_age>=15 & death_age<20,1,0))
-stat01_19$ag05=with(stat01_19,ifelse(death_age>=20 & death_age<25,1,0))
-stat01_19$ag06=with(stat01_19,ifelse(death_age>=25 & death_age<30,1,0))
-stat01_19$ag07=with(stat01_19,ifelse(death_age>=30 & death_age<35,1,0))
-stat01_19$ag08=with(stat01_19,ifelse(death_age>=35 & death_age<40,1,0))
-stat01_19$ag09=with(stat01_19,ifelse(death_age>=40 & death_age<45,1,0))
-stat01_19$ag10=with(stat01_19,ifelse(death_age>=45 & death_age<50,1,0))
-stat01_19$ag11=with(stat01_19,ifelse(death_age>=50 & death_age<55,1,0))
-stat01_19$ag12=with(stat01_19,ifelse(death_age>=55 & death_age<60,1,0))
-stat01_19$ag13=with(stat01_19,ifelse(death_age>=60 & death_age<65,1,0))
-stat01_19$ag14=with(stat01_19,ifelse(death_age>=65 & death_age<70,1,0))
-stat01_19$ag15=with(stat01_19,ifelse(death_age>=70 & death_age<75,1,0))
-stat01_19$ag16=with(stat01_19,ifelse(death_age>=75 & death_age<80,1,0))
-stat01_19$ag17=with(stat01_19,ifelse(death_age>=80 & death_age<85,1,0))
-stat01_19$ag18=with(stat01_19,ifelse(death_age>=85 & death_age<90,1,0))
-stat01_19$ag19=with(stat01_19,ifelse(death_age>=90,1,0))
+nrow(stat01_20) #5,268,072
+summary(stat01_20$death_age)
 
-#¼ºº°
-stat01_19$sex_m=with(stat01_19,ifelse(sex==1,1,0))
-stat01_19$sex_f=with(stat01_19,ifelse(sex==2,1,0))
-
-#½Ãµµ
-stat01_19$sido01=with(stat01_19,ifelse(sido==11,1,0));stat01_19$sido02=with(stat01_19,ifelse(sido==21,1,0))
-stat01_19$sido03=with(stat01_19,ifelse(sido==22,1,0));stat01_19$sido04=with(stat01_19,ifelse(sido==23,1,0))
-stat01_19$sido05=with(stat01_19,ifelse(sido==24,1,0));stat01_19$sido06=with(stat01_19,ifelse(sido==25,1,0))
-stat01_19$sido07=with(stat01_19,ifelse(sido==26,1,0));stat01_19$sido08=with(stat01_19,ifelse(sido==29,1,0))
-stat01_19$sido09=with(stat01_19,ifelse(sido==31,1,0));stat01_19$sido10=with(stat01_19,ifelse(sido==32,1,0))
-stat01_19$sido11=with(stat01_19,ifelse(sido==33,1,0));stat01_19$sido12=with(stat01_19,ifelse(sido==34,1,0))
-stat01_19$sido13=with(stat01_19,ifelse(sido==35,1,0));stat01_19$sido14=with(stat01_19,ifelse(sido==36,1,0))
-stat01_19$sido15=with(stat01_19,ifelse(sido==37,1,0));stat01_19$sido16=with(stat01_19,ifelse(sido==38,1,0))
-stat01_19$sido17=with(stat01_19,ifelse(sido==39,1,0))
+addmargins(substr(stat01_20$death1,1,1) %>% table)
+addmargins(table(stat01_20$sido))
+addmargins(table(stat01_20$sex))
 
 #--------------------------------------------------------------------------------------------------#
 #--------------------------------------------------------------------------------------------------#
-#¿¬·Éº° ¼ºº°:³²
-stat01_19$ag01_m=with(stat01_19,ifelse(sex==1 & ag01==1,1,0));stat01_19$ag02_m=with(stat01_19,ifelse(sex==1 & ag02==1,1,0))
-stat01_19$ag03_m=with(stat01_19,ifelse(sex==1 & ag03==1,1,0));stat01_19$ag04_m=with(stat01_19,ifelse(sex==1 & ag04==1,1,0))
-stat01_19$ag05_m=with(stat01_19,ifelse(sex==1 & ag05==1,1,0));stat01_19$ag06_m=with(stat01_19,ifelse(sex==1 & ag06==1,1,0))
-stat01_19$ag07_m=with(stat01_19,ifelse(sex==1 & ag07==1,1,0));stat01_19$ag08_m=with(stat01_19,ifelse(sex==1 & ag08==1,1,0))
-stat01_19$ag09_m=with(stat01_19,ifelse(sex==1 & ag09==1,1,0));stat01_19$ag10_m=with(stat01_19,ifelse(sex==1 & ag10==1,1,0))
-stat01_19$ag11_m=with(stat01_19,ifelse(sex==1 & ag11==1,1,0));stat01_19$ag12_m=with(stat01_19,ifelse(sex==1 & ag12==1,1,0))
-stat01_19$ag13_m=with(stat01_19,ifelse(sex==1 & ag13==1,1,0));stat01_19$ag14_m=with(stat01_19,ifelse(sex==1 & ag14==1,1,0))
-stat01_19$ag15_m=with(stat01_19,ifelse(sex==1 & ag15==1,1,0));stat01_19$ag16_m=with(stat01_19,ifelse(sex==1 & ag16==1,1,0))
-stat01_19$ag17_m=with(stat01_19,ifelse(sex==1 & ag17==1,1,0));stat01_19$ag18_m=with(stat01_19,ifelse(sex==1 & ag18==1,1,0))
-stat01_19$ag19_m=with(stat01_19,ifelse(sex==1 & ag19==1,1,0))
+#ì—°ë ¹
+stat01_20$ag01=with(stat01_20,ifelse(death_age<5,1,0))
+stat01_20$ag02=with(stat01_20,ifelse(death_age>=5 & death_age<10,1,0))
+stat01_20$ag03=with(stat01_20,ifelse(death_age>=10 & death_age<15,1,0))
+stat01_20$ag04=with(stat01_20,ifelse(death_age>=15 & death_age<20,1,0))
+stat01_20$ag05=with(stat01_20,ifelse(death_age>=20 & death_age<25,1,0))
+stat01_20$ag06=with(stat01_20,ifelse(death_age>=25 & death_age<30,1,0))
+stat01_20$ag07=with(stat01_20,ifelse(death_age>=30 & death_age<35,1,0))
+stat01_20$ag08=with(stat01_20,ifelse(death_age>=35 & death_age<40,1,0))
+stat01_20$ag09=with(stat01_20,ifelse(death_age>=40 & death_age<45,1,0))
+stat01_20$ag10=with(stat01_20,ifelse(death_age>=45 & death_age<50,1,0))
+stat01_20$ag11=with(stat01_20,ifelse(death_age>=50 & death_age<55,1,0))
+stat01_20$ag12=with(stat01_20,ifelse(death_age>=55 & death_age<60,1,0))
+stat01_20$ag13=with(stat01_20,ifelse(death_age>=60 & death_age<65,1,0))
+stat01_20$ag14=with(stat01_20,ifelse(death_age>=65 & death_age<70,1,0))
+stat01_20$ag15=with(stat01_20,ifelse(death_age>=70 & death_age<75,1,0))
+stat01_20$ag16=with(stat01_20,ifelse(death_age>=75 & death_age<80,1,0))
+stat01_20$ag17=with(stat01_20,ifelse(death_age>=80 & death_age<85,1,0))
+stat01_20$ag18=with(stat01_20,ifelse(death_age>=85 & death_age<90,1,0))
+stat01_20$ag19=with(stat01_20,ifelse(death_age>=90,1,0))
 
-#¿¬·Éº° ¼ºº°:¿©
-stat01_19$ag01_f=with(stat01_19,ifelse(sex==2 & ag01==1,1,0));stat01_19$ag02_f=with(stat01_19,ifelse(sex==2 & ag02==1,1,0))
-stat01_19$ag03_f=with(stat01_19,ifelse(sex==2 & ag03==1,1,0));stat01_19$ag04_f=with(stat01_19,ifelse(sex==2 & ag04==1,1,0))
-stat01_19$ag05_f=with(stat01_19,ifelse(sex==2 & ag05==1,1,0));stat01_19$ag06_f=with(stat01_19,ifelse(sex==2 & ag06==1,1,0))
-stat01_19$ag07_f=with(stat01_19,ifelse(sex==2 & ag07==1,1,0));stat01_19$ag08_f=with(stat01_19,ifelse(sex==2 & ag08==1,1,0))
-stat01_19$ag09_f=with(stat01_19,ifelse(sex==2 & ag09==1,1,0));stat01_19$ag10_f=with(stat01_19,ifelse(sex==2 & ag10==1,1,0))
-stat01_19$ag11_f=with(stat01_19,ifelse(sex==2 & ag11==1,1,0));stat01_19$ag12_f=with(stat01_19,ifelse(sex==2 & ag12==1,1,0))
-stat01_19$ag13_f=with(stat01_19,ifelse(sex==2 & ag13==1,1,0));stat01_19$ag14_f=with(stat01_19,ifelse(sex==2 & ag14==1,1,0))
-stat01_19$ag15_f=with(stat01_19,ifelse(sex==2 & ag15==1,1,0));stat01_19$ag16_f=with(stat01_19,ifelse(sex==2 & ag16==1,1,0))
-stat01_19$ag17_f=with(stat01_19,ifelse(sex==2 & ag17==1,1,0));stat01_19$ag18_f=with(stat01_19,ifelse(sex==2 & ag18==1,1,0))
-stat01_19$ag19_f=with(stat01_19,ifelse(sex==2 & ag19==1,1,0))
+#ì„±ë³„
+stat01_20$sex_m=with(stat01_20,ifelse(sex==1,1,0))
+stat01_20$sex_f=with(stat01_20,ifelse(sex==2,1,0))
 
-#°ËÅä¿ë
-#apply(stat01_19 %>%  dplyr::select(ag01:ag19),2,sum) %>% sum
-
-#»ç¸Á¿øÀÎ °ËÅä, »ç¸Á¿øÀÎ 2´Â V, W, X, Y µîÀÓ
-table(substr(stat01_19$death2,1,1))
+#ì‹œë„
+stat01_20$sido01=with(stat01_20,ifelse(sido==11,1,0));stat01_20$sido02=with(stat01_20,ifelse(sido==21,1,0))
+stat01_20$sido03=with(stat01_20,ifelse(sido==22,1,0));stat01_20$sido04=with(stat01_20,ifelse(sido==23,1,0))
+stat01_20$sido05=with(stat01_20,ifelse(sido==24,1,0));stat01_20$sido06=with(stat01_20,ifelse(sido==25,1,0))
+stat01_20$sido07=with(stat01_20,ifelse(sido==26,1,0));stat01_20$sido08=with(stat01_20,ifelse(sido==29,1,0))
+stat01_20$sido09=with(stat01_20,ifelse(sido==31,1,0));stat01_20$sido10=with(stat01_20,ifelse(sido==32,1,0))
+stat01_20$sido11=with(stat01_20,ifelse(sido==33,1,0));stat01_20$sido12=with(stat01_20,ifelse(sido==34,1,0))
+stat01_20$sido13=with(stat01_20,ifelse(sido==35,1,0));stat01_20$sido14=with(stat01_20,ifelse(sido==36,1,0))
+stat01_20$sido15=with(stat01_20,ifelse(sido==37,1,0));stat01_20$sido16=with(stat01_20,ifelse(sido==38,1,0))
+stat01_20$sido17=with(stat01_20,ifelse(sido==39,1,0))
 
 #--------------------------------------------------------------------------------------------------#
 #--------------------------------------------------------------------------------------------------#
-#¿¬µµº°-Áö¿ªº°  ÁúÈ¯ ÀÚ·á Áı°è 
+#ì—°ë ¹ë³„ ì„±ë³„:ë‚¨
+stat01_20$ag01_m=with(stat01_20,ifelse(sex==1 & ag01==1,1,0));stat01_20$ag02_m=with(stat01_20,ifelse(sex==1 & ag02==1,1,0))
+stat01_20$ag03_m=with(stat01_20,ifelse(sex==1 & ag03==1,1,0));stat01_20$ag04_m=with(stat01_20,ifelse(sex==1 & ag04==1,1,0))
+stat01_20$ag05_m=with(stat01_20,ifelse(sex==1 & ag05==1,1,0));stat01_20$ag06_m=with(stat01_20,ifelse(sex==1 & ag06==1,1,0))
+stat01_20$ag07_m=with(stat01_20,ifelse(sex==1 & ag07==1,1,0));stat01_20$ag08_m=with(stat01_20,ifelse(sex==1 & ag08==1,1,0))
+stat01_20$ag09_m=with(stat01_20,ifelse(sex==1 & ag09==1,1,0));stat01_20$ag10_m=with(stat01_20,ifelse(sex==1 & ag10==1,1,0))
+stat01_20$ag11_m=with(stat01_20,ifelse(sex==1 & ag11==1,1,0));stat01_20$ag12_m=with(stat01_20,ifelse(sex==1 & ag12==1,1,0))
+stat01_20$ag13_m=with(stat01_20,ifelse(sex==1 & ag13==1,1,0));stat01_20$ag14_m=with(stat01_20,ifelse(sex==1 & ag14==1,1,0))
+stat01_20$ag15_m=with(stat01_20,ifelse(sex==1 & ag15==1,1,0));stat01_20$ag16_m=with(stat01_20,ifelse(sex==1 & ag16==1,1,0))
+stat01_20$ag17_m=with(stat01_20,ifelse(sex==1 & ag17==1,1,0));stat01_20$ag18_m=with(stat01_20,ifelse(sex==1 & ag18==1,1,0))
+stat01_20$ag19_m=with(stat01_20,ifelse(sex==1 & ag19==1,1,0))
 
-yr=data.frame(year=2001:2019)
-label=c("ÀüÃ¼","¿¬·É","0-4","5-9","10-14","15-19","20-24","25-29","30-34","35-39","40-44","45-49","50-54",
+#ì—°ë ¹ë³„ ì„±ë³„:ì—¬
+stat01_20$ag01_f=with(stat01_20,ifelse(sex==2 & ag01==1,1,0));stat01_20$ag02_f=with(stat01_20,ifelse(sex==2 & ag02==1,1,0))
+stat01_20$ag03_f=with(stat01_20,ifelse(sex==2 & ag03==1,1,0));stat01_20$ag04_f=with(stat01_20,ifelse(sex==2 & ag04==1,1,0))
+stat01_20$ag05_f=with(stat01_20,ifelse(sex==2 & ag05==1,1,0));stat01_20$ag06_f=with(stat01_20,ifelse(sex==2 & ag06==1,1,0))
+stat01_20$ag07_f=with(stat01_20,ifelse(sex==2 & ag07==1,1,0));stat01_20$ag08_f=with(stat01_20,ifelse(sex==2 & ag08==1,1,0))
+stat01_20$ag09_f=with(stat01_20,ifelse(sex==2 & ag09==1,1,0));stat01_20$ag10_f=with(stat01_20,ifelse(sex==2 & ag10==1,1,0))
+stat01_20$ag11_f=with(stat01_20,ifelse(sex==2 & ag11==1,1,0));stat01_20$ag12_f=with(stat01_20,ifelse(sex==2 & ag12==1,1,0))
+stat01_20$ag13_f=with(stat01_20,ifelse(sex==2 & ag13==1,1,0));stat01_20$ag14_f=with(stat01_20,ifelse(sex==2 & ag14==1,1,0))
+stat01_20$ag15_f=with(stat01_20,ifelse(sex==2 & ag15==1,1,0));stat01_20$ag16_f=with(stat01_20,ifelse(sex==2 & ag16==1,1,0))
+stat01_20$ag17_f=with(stat01_20,ifelse(sex==2 & ag17==1,1,0));stat01_20$ag18_f=with(stat01_20,ifelse(sex==2 & ag18==1,1,0))
+stat01_20$ag19_f=with(stat01_20,ifelse(sex==2 & ag19==1,1,0))
+
+#ê²€í† ìš©
+apply(stat01_20 %>%  dplyr::select(ag01:ag19),2,sum) %>% sum
+
+#ì‚¬ë§ì›ì¸ ê²€í† , ì‚¬ë§ì›ì¸ 2ëŠ” V, W, X, Y ë“±ì„
+table(substr(stat01_20$death2,1,1))
+
+#--------------------------------------------------------------------------------------------------#
+#--------------------------------------------------------------------------------------------------#
+#ì—°ë„ë³„-ì§€ì—­ë³„  ì§ˆí™˜ ìë£Œ ì§‘ê³„ 
+
+yr=data.frame(year=2001:2020)
+label=c("ì „ì²´","ì—°ë ¹","0-4","5-9","10-14","15-19","20-24","25-29","30-34","35-39","40-44","45-49","50-54",
         "55-59","60-64","65-69","70-74","75-79","80-84","85-90","90+",
-        "¼ºº°","³²","¿©",
-        "Áö¿ª","¼­¿ï","ºÎ»ê","´ë±¸","ÀÎÃµ","±¤ÁÖ","´ëÀü","¿ï»ê","¼¼Á¾","°æ±â","°­¿ø","ÃæºÏ","Ãæ³²","ÀüºÏ",
-        "Àü³²","°æºÏ","°æ³²","Á¦ÁÖ")
+        "ì„±ë³„","ë‚¨","ì—¬",
+        "ì§€ì—­","ì„œìš¸","ë¶€ì‚°","ëŒ€êµ¬","ì¸ì²œ","ê´‘ì£¼","ëŒ€ì „","ìš¸ì‚°","ì„¸ì¢…","ê²½ê¸°","ê°•ì›","ì¶©ë¶","ì¶©ë‚¨","ì „ë¶",
+        "ì „ë‚¨","ê²½ë¶","ê²½ë‚¨","ì œì£¼")
 
-#Áı°è Å×ÀÌºí, ÇÔ¼ö
+#ì§‘ê³„ í…Œì´ë¸”, í•¨ìˆ˜
 agg_tb<-function(data){
   d.list=NULL
-  for(i in 1:19){
+  for(i in 1:20){
+    
     d<-subset(data,year==yr$year[i])
     d.list[[i]]<-data.frame(count=apply(d %>% dplyr:: select(ag01:sido17),2,sum))}
   agg_df<-as.data.frame(do.call(cbind,d.list))
-  names(agg_df)=paste0(2001:2019)
-  agg_df$Total=apply(agg_df %>% dplyr:: select(`2001`:`2019`),1,sum)
+  names(agg_df)=paste0(2001:2020)
   
-  year.tot<-apply(agg_df[1:19,] %>% dplyr:: select(`2001`:`2019`),2,sum)
+  agg_df$Total=apply(agg_df %>% dplyr:: select(`2001`:`2020`),1,sum)
+  
+  year.tot<-apply(agg_df[1:19,] %>% dplyr:: select(`2001`:`2020`),2,sum)
   tot<-sum(year.tot)
   
-  agg_df<-agg_df %>% select(Total,`2001`:`2019`)
+  agg_df<-agg_df %>% select(Total,`2001`:`2020`)
   agg_df.r<-rbind(c(tot,year.tot),NA,agg_df[1:19,],NA,agg_df[20:21,],NA,agg_df[22:38,])
   row.names(agg_df.r)=label
   agg_df.r}
 
 #--------------------------------------------------------------------------------------------------#
 #--------------------------------------------------------------------------------------------------#
-#ÁúÈ¯º°·Î Á¤¸® 
-#ÀüÃ¼ °¨¿°º´ ÁúÈ¯ (A00-A09)
-z01<-subset(stat01_19,substr(death1,1,3) %in% c("A00","A01","A02","A03","A04","A05","A06","A07","A08","A09"))
-#ÀüÃ¼ ½É³úÇ÷°ü ÁúÈ¯ (I00-I99)
-z02<-subset(stat01_19,substr(death1,1,1) %in% c("I"))
-#Çù½ÉÁõ (I20)
-z03<-subset(stat01_19,substr(death1,1,3) %in% c("I20"))
-#½É±Ù°æ»ö (I21-I25)
-z04<-subset(stat01_19,substr(death1,1,3) %in% c("I21","I22","I23","I24","I25"))
-#ÀüÃ¼ ÇãÇ÷¼º ½ÉÁúÈ¯ (I20-I25)
-z05<-subset(stat01_19,substr(death1,1,3) %in% c("I20","I21","I22","I23","I24","I25"))
-#ÀüÃ¼ ³úÁ¹Áß (I60-I67, I690-I694,G458-G459)
-z06<-rbind(subset(stat01_19,substr(death1,1,3) %in% c("I60","I61","I62","I63","I64","I65","I66","I67")),
-           subset(stat01_19,substr(death1,1,4) %in% c("I690","I691","I692","I693","I694","G458","G459")))
-#ÀüÃ¼ È£Èí±â (J00-J99)
-z07<-subset(stat01_19,substr(death1,1,1) %in% c("J"))
-#±Ş¼º »ó±âµµ °¨¿° (J00-J06)
-z08<-subset(stat01_19,substr(death1,1,3) %in% c("J00","J01","J02","J03","J04","J05","J06"))
-#ÀÎÇÃ·ç¿£ÀÚ ¹× Æó·Å (J09-J18)
-z09<-subset(stat01_19,substr(death1,1,3) %in% c("J09","J10","J11","J12","J13","J14","J15","J16","J17","J18"))
-#Ãµ½Ä (J45-46)
-z10<-subset(stat01_19,substr(death1,1,3) %in% c("J45","J46"))
-#¿ëÀû °í°¥ Å»¼ö (E86)
-z11<-subset(stat01_19,substr(death1,1,3) %in% c("E86"))
-#°í¿Â °ü·ÃÁúÈ¯ (¿­»çº´, ¿­ÇÇ·Î) (T67)
-z12<-subset(stat01_19,substr(death1,1,3) %in% c("T67"))
-#¿Â¿­ÁúÈ¯ (E86, T67)
-z13<-subset(stat01_19,substr(death1,1,3) %in% c("E86","T67"))
-#µ¿»ó (T33-T35)
-z14<-subset(stat01_19,substr(death1,1,3) %in% c("T33","T34","T35"))
-#ÀúÃ¼¿ÂÁõ (T68)
-z15<-subset(stat01_19,substr(death1,1,3) %in% c("T68"))
-#ºñµ¿°á ¹× ±âÅ¸ (T69)
-z16<-subset(stat01_19,substr(death1,1,3) %in% c("T69"))
-#ÇÑ·©ÁúÈ¯ (T33-T35,T68,T69)
-z17<-subset(stat01_19,substr(death1,1,3) %in% c("T33","T34","T35","T68","T69"))
-#±Ş¼º ½ÅºÎÀüÁõ (N17)
-z18<-subset(stat01_19,substr(death1,1,3) %in% c("N17"))
-#ÀÚ»ì (X60-X84)
-z19<-subset(stat01_19,substr(death2,1,3) %in% c(paste0("X",60:84)))
-#¿ì¿ïÁõ (F31-F39)
-z20<-subset(stat01_19,substr(death1,1,3) %in% c("F31","F32","F33","F34","F35","F36","F37","F38","F39"))
+#ì§ˆí™˜ë³„ë¡œ ì •ë¦¬ 
+#ì „ì²´ ê°ì—¼ë³‘ ì§ˆí™˜ (A00-A09)
+z01<-subset(stat01_20,substr(death1,1,3) %in% c("A00","A01","A02","A03","A04","A05","A06","A07","A08","A09"))
 
-#Ãß°¡ÇÑ ºÎºĞ
-#ÀüÃ¼ ¿øÀÎ »ç¸Á (A00-Z99)
-z21<-stat01_19
-#ºñ»ç°í»ç »ç¸Á  (A00-R99)
-z22<-subset(stat01_19,!substr(death1,1,1) %in% c("S","T",'U'))
+#ì „ì²´ ì‹¬ë‡Œí˜ˆê´€ ì§ˆí™˜ (I00-I99)
+z02<-subset(stat01_20,substr(death1,1,1) %in% c("I"))
 
-#ÃâÇ÷¼º ³úÁ¹Áß  (I60-I62, I690-I692)
-z23<-rbind(subset(stat01_19,substr(death1,1,3) %in% c("I60","I61","I62")),
-           subset(stat01_19,substr(death1,1,4) %in% c("I690","I691","I692")))
+#í˜‘ì‹¬ì¦ (I20)
+z03<-subset(stat01_20,substr(death1,1,3) %in% c("I20"))
 
-#ÇãÇ÷¼º ³úÁ¹Áß  (I63,I65-I67, I693)
-z24<-rbind(subset(stat01_19,substr(death1,1,3) %in% c("I63","I65","I66","I67")),
-           subset(stat01_19,substr(death1,1,4) %in% c("I693")))
+#ì‹¬ê·¼ê²½ìƒ‰ (I21-I25)
+z04<-subset(stat01_20,substr(death1,1,3) %in% c("I21","I22","I23","I24","I25"))
 
-#±âÅ¸ ³úÁ¹Áß  (I64, I694)
-z25<-rbind(subset(stat01_19,substr(death1,1,3) %in% c("I64")),
-           subset(stat01_19,substr(death1,1,4) %in% c("I694")))
+#ì „ì²´ í—ˆí˜ˆì„± ì‹¬ì§ˆí™˜ (I20-I25)
+z05<-subset(stat01_20,substr(death1,1,3) %in% c("I20","I21","I22","I23","I24","I25"))
 
-#ÀÏ°ú¼º ³úÇãÇ÷ÁúÈ¯ (G458-G459)
-z26<-subset(stat01_19,substr(death1,1,4) %in% c("G458","G459"))
+#ì „ì²´ ë‡Œì¡¸ì¤‘ (I60-I67, I690-I694,G458-G459)
+z06<-rbind(subset(stat01_20,substr(death1,1,3) %in% c("I60","I61","I62","I63","I64","I65","I66","I67")),
+           subset(stat01_20,substr(death1,1,4) %in% c("I690","I691","I692","I693","I694","G458","G459")))
 
-#ÇÏºÎÈ£Èí±âÁúÈ¯ (J20-J22)
-z27<-subset(stat01_19,substr(death1,1,3) %in% c("J20","J21","J22"))
+#ì „ì²´ í˜¸í¡ê¸° (J00-J99)
+z07<-subset(stat01_20,substr(death1,1,1) %in% c("J"))
 
-#¸¸¼ºÆó¼â¼ºÆóÁúÈ¯ (J40-J44)
-z28<-subset(stat01_19,substr(death1,1,3) %in% c(paste0("J",40:44)))
+#ê¸‰ì„± ìƒê¸°ë„ ê°ì—¼ (J00-J06)
+z08<-subset(stat01_20,substr(death1,1,3) %in% c("J00","J01","J02","J03","J04","J05","J06"))
 
-#´ç´¢ (E10-E14)
-z29<-subset(stat01_19,substr(death1,1,3) %in% c(paste0("E",10:14)))
+#ì¸í”Œë£¨ì—”ì ë° íë ´ (J09-J18)
+z09<-subset(stat01_20,substr(death1,1,3) %in% c("J09","J10","J11","J12","J13","J14","J15","J16","J17","J18"))
 
-#½ÅÀåÁúÈ¯ (N00-N29)
+#ì²œì‹ (J45-46)
+z10<-subset(stat01_20,substr(death1,1,3) %in% c("J45","J46"))
+
+#ìš©ì  ê³ ê°ˆ íƒˆìˆ˜ (E86)
+z11<-subset(stat01_20,substr(death1,1,3) %in% c("E86"))
+
+#ê³ ì˜¨ ê´€ë ¨ì§ˆí™˜ (ì—´ì‚¬ë³‘, ì—´í”¼ë¡œ) (T67)
+z12<-subset(stat01_20,substr(death1,1,3) %in% c("T67"))
+
+#ì˜¨ì—´ì§ˆí™˜ (E86, T67)
+z13<-subset(stat01_20,substr(death1,1,3) %in% c("E86","T67"))
+
+#ë™ìƒ (T33-T35)
+z14<-subset(stat01_20,substr(death1,1,3) %in% c("T33","T34","T35"))
+
+#ì €ì²´ì˜¨ì¦ (T68)
+z15<-subset(stat01_20,substr(death1,1,3) %in% c("T68"))
+
+#ë¹„ë™ê²° ë° ê¸°íƒ€ (T69)
+z16<-subset(stat01_20,substr(death1,1,3) %in% c("T69"))
+
+#í•œë­ì§ˆí™˜ (T33-T35,T68,T69)
+z17<-subset(stat01_20,substr(death1,1,3) %in% c("T33","T34","T35","T68","T69"))
+
+#ê¸‰ì„± ì‹ ë¶€ì „ì¦ (N17)
+z18<-subset(stat01_20,substr(death1,1,3) %in% c("N17"))
+
+#ìì‚´ (X60-X84)
+z19<-subset(stat01_20,substr(death2,1,3) %in% c(paste0("X",60:84)))
+
+#ìš°ìš¸ì¦ (F31-F39)
+z20<-subset(stat01_20,substr(death1,1,3) %in% c("F31","F32","F33","F34","F35","F36","F37","F38","F39"))
+
+#ì¶”ê°€í•œ ë¶€ë¶„
+#ì „ì²´ ì›ì¸ ì‚¬ë§ (A00-Z99)
+z21<-stat01_20
+
+#ë¹„ì‚¬ê³ ì‚¬ ì‚¬ë§  (A00-R99)
+z22<-subset(stat01_20,!substr(death1,1,1) %in% c("S","T",'U'))
+
+#ì¶œí˜ˆì„± ë‡Œì¡¸ì¤‘  (I60-I62, I690-I692)
+z23<-rbind(subset(stat01_20,substr(death1,1,3) %in% c("I60","I61","I62")),
+           subset(stat01_20,substr(death1,1,4) %in% c("I690","I691","I692")))
+
+#í—ˆí˜ˆì„± ë‡Œì¡¸ì¤‘  (I63,I65-I67, I693)
+z24<-rbind(subset(stat01_20,substr(death1,1,3) %in% c("I63","I65","I66","I67")),
+           subset(stat01_20,substr(death1,1,4) %in% c("I693")))
+
+#ê¸°íƒ€ ë‡Œì¡¸ì¤‘  (I64, I694)
+z25<-rbind(subset(stat01_20,substr(death1,1,3) %in% c("I64")),
+           subset(stat01_20,substr(death1,1,4) %in% c("I694")))
+
+#ì¼ê³¼ì„± ë‡Œí—ˆí˜ˆì§ˆí™˜ (G458-G459)
+z26<-subset(stat01_20,substr(death1,1,4) %in% c("G458","G459"))
+
+#í•˜ë¶€í˜¸í¡ê¸°ì§ˆí™˜ (J20-J22)
+z27<-subset(stat01_20,substr(death1,1,3) %in% c("J20","J21","J22"))
+
+#ë§Œì„±íì‡„ì„±íì§ˆí™˜ (J40-J44)
+z28<-subset(stat01_20,substr(death1,1,3) %in% c(paste0("J",40:44)))
+
+#ë‹¹ë‡¨ (E10-E14)
+z29<-subset(stat01_20,substr(death1,1,3) %in% c(paste0("E",10:14)))
+
+#ì‹ ì¥ì§ˆí™˜ (N00-N29)
 k=00:29 ; ifelse(k<10,paste0(0,k),k)
-z30<-subset(stat01_19,substr(death1,1,3) %in% c(paste0("N",ifelse(k<10,paste0(0,k),k))))
+z30<-subset(stat01_20,substr(death1,1,3) %in% c(paste0("N",ifelse(k<10,paste0(0,k),k))))
 
-#»ç°í»ç (S00-S99, T00-T99, U00-U99)
-z31<-subset(stat01_19,substr(death1,1,1) %in% c("S","T","U"))
+#ì‚¬ê³ ì‚¬ (S00-S99, T00-T99, U00-U99)
+z31<-subset(stat01_20,substr(death1,1,1) %in% c("S","T","U"))
 
 #--------------------------------------------------------------------------------------------------#
 #--------------------------------------------------------------------------------------------------#
@@ -238,4 +269,35 @@ out25<-agg_tb(z25);out26<-agg_tb(z26);out27<-agg_tb(z27);out28<-agg_tb(z28)
 out29<-agg_tb(z29);out30<-agg_tb(z30);out31<-agg_tb(z31)
 
 #Save the resutls (01-30)
-# write.csv(out01,file="D:\\SNU\\±âÈÄº¸°Ç¿µÇâÆò°¡\\¹İÃâ\\out01.csv",row.names=T,na="")
+setwd("D:\\SNU\\ì—°êµ¬\\ì§ˆë³‘ê´€ë¦¬ë³¸ë¶€\\ê¸°í›„ë³´ê±´ì˜í–¥í‰ê°€_í‰ê°€ì²´ê³„êµ¬ì¶•ë°ì‹œë²”ì‚¬ì—…\\2022\\ìë£Œ\\í†µê³„ì²­\\summary")
+write.csv(out01,file="out01.csv",row.names=T,na="")
+write.csv(out02,file="out02.csv",row.names=T,na="")
+write.csv(out03,file="out03.csv",row.names=T,na="")
+write.csv(out04,file="out04.csv",row.names=T,na="")
+write.csv(out05,file="out05.csv",row.names=T,na="")
+write.csv(out06,file="out06.csv",row.names=T,na="")
+write.csv(out07,file="out07.csv",row.names=T,na="")
+write.csv(out08,file="out08.csv",row.names=T,na="")
+write.csv(out09,file="out09.csv",row.names=T,na="")
+write.csv(out10,file="out10.csv",row.names=T,na="")
+write.csv(out11,file="out11.csv",row.names=T,na="")
+write.csv(out12,file="out12.csv",row.names=T,na="")
+write.csv(out13,file="out13.csv",row.names=T,na="")
+write.csv(out14,file="out14.csv",row.names=T,na="")
+write.csv(out15,file="out15.csv",row.names=T,na="")
+write.csv(out16,file="out16.csv",row.names=T,na="")
+write.csv(out17,file="out17.csv",row.names=T,na="")
+write.csv(out18,file="out18.csv",row.names=T,na="")
+write.csv(out19,file="out19.csv",row.names=T,na="")
+write.csv(out20,file="out20.csv",row.names=T,na="")
+write.csv(out21,file="out21.csv",row.names=T,na="")
+write.csv(out22,file="out22.csv",row.names=T,na="")
+write.csv(out23,file="out23.csv",row.names=T,na="")
+write.csv(out24,file="out24.csv",row.names=T,na="")
+write.csv(out25,file="out25.csv",row.names=T,na="")
+write.csv(out26,file="out26.csv",row.names=T,na="")
+write.csv(out27,file="out27.csv",row.names=T,na="")
+write.csv(out28,file="out28.csv",row.names=T,na="")
+write.csv(out29,file="out29.csv",row.names=T,na="")
+write.csv(out30,file="out30.csv",row.names=T,na="")
+write.csv(out31,file="out31.csv",row.names=T,na="")
