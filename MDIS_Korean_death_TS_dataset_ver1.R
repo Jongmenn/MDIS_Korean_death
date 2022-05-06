@@ -56,16 +56,19 @@ daily_count<-function(data){
   zz<-merge(dd,r,by="key",all.x=T)
   
   zz[is.na(zz)]<-0
+
   zz$year=year(zz$date)
   zz$month=month(zz$date)
   zz$day=day(zz$date)
   zz$dow=weekdays(zz$date)
-  
+
   zz2<-merge(zz,sido_df,by="sido",all.x=T)
+  
   zz2$key=paste0(zz2$KOR_SIDO,"-",zz2$date)
   zz2<-zz2 %>% select(-date)
-  zz3<-zz2 %>% left_join (me)
-  zz3<-zz3  %>% arrange(sido);
+  
+  zz2 %>% select(sido,key,year:EN_SIDO) %>% head
+  zz3<-zz2 %>% left_join (me %>% select(ddate,area,key,mintemp:pm25_model)) %>% arrange(sido)
   #zz3<-zz3 %>% dplyr:: select(key,date,sido,KOR_SIDO,EN_SIDO,year:dow,Total:ag19_f,mintemp:meanpress2) %>% arrange(sido);
   zz3}
 
